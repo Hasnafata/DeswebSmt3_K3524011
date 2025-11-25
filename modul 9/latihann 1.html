@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Web Storage</title>
+</head>
+<body>
+<center>
+    <h1 id="judul">Selamat Datang, Member!</h1>
+
+    <button onclick="tambahNama(event)">Masukkan Nama</button>
+
+    <h2>Daftar Member:</h2>
+    <div id="list"></div>
+</center>
+
+<script type="text/javascript">
+
+    const judul = document.getElementById('judul');
+    const list = document.getElementById('list');
+
+    // Menampilkan nama dalam daftar
+    function tampilkanNama() {
+        const data = JSON.parse(localStorage.getItem('namaList')) || [];
+
+        // Jika ada nama terakhir, tampilkan "Halo, nama!"
+        const lastName = localStorage.getItem('namaTerakhir');
+        if (lastName) {
+            judul.innerHTML = "Halo, " + lastName + "!";
+        }
+
+        if (data.length === 0) {
+            list.innerHTML = "<p>(Belum ada member)</p>";
+            return;
+        }
+
+        let html = "<ul>";
+        data.forEach((nama, index) => {
+            html += `
+                <li>
+                    ${nama}
+                    <button onclick="hapusSatu(${index})">Hapus</button>
+                </li>
+            `;
+        });
+        html += "</ul>";
+
+        list.innerHTML = html;
+    }
+
+    tampilkanNama();
+
+    // Tambah nama baru
+    function tambahNama(e) {
+        let nama = prompt('Masukkan nama Anda:');
+
+        if (nama && nama.trim() !== "") {
+
+            let data = JSON.parse(localStorage.getItem('namaList')) || [];
+
+            // Tambah nama ke daftar (nama lama tetap ada)
+            data.push(nama);
+            localStorage.setItem('namaList', JSON.stringify(data));
+
+            // Simpan nama terakhir untuk ditampilkan di judul
+            localStorage.setItem('namaTerakhir', nama);
+
+            // Update tulisan halo
+            judul.innerHTML = "Halo, " + nama + "!";
+
+            tampilkanNama();
+        } else {
+            alert('Nama tidak boleh kosong!');
+        }
+
+        e.preventDefault();
+    }
+
+    // Hapus salah satu nama
+    function hapusSatu(i) {
+        let data = JSON.parse(localStorage.getItem('namaList')) || [];
+
+        let namaHapus = data[i];
+        if (confirm(`Yakin ingin menghapus nama "${namaHapus}" ?`)) {
+            data.splice(i, 1);
+            localStorage.setItem('namaList', JSON.stringify(data));
+        }
+
+        tampilkanNama();
+    }
+
+</script>
+</body>
+</html>
